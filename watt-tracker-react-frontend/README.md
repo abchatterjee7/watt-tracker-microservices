@@ -1,6 +1,10 @@
 # Watt Tracker React Frontend
 
-A comprehensive React frontend for the Watt Tracker microservices-based energy monitoring system. This application provides real-time energy consumption tracking, device management, and intelligent alerting for household energy usage.
+A comprehensive React frontend for the Watt Tracker microservices-based energy monitoring system. This application provides real-time energy consumption tracking, device management, and intelligent alerting for household energy usage, and energy saving tips from AI model.
+
+## Screenshots
+
+### Watt Tracker Microservices Architecture
 
 - How to calculate wattage and price inside watt-tracker-microservices
 ![power](../screenshots/power.png)
@@ -9,26 +13,41 @@ A comprehensive React frontend for the Watt Tracker microservices-based energy m
 ![requirements](../screenshots/requirements.png)
 
 - How services will look alike
-![diagram](../screenshots/diagram.png)
+![diagrams](../screenshots/diagrams.png)
 
 - How eureka-services will look alike
 ![eureka](../screenshots/eureka.png)
 
-- How watt-tracker app looks
-![watt-tracker](../screenshots/1.png)
-![watt-tracker](../screenshots/2.png)
-![watt-tracker](../screenshots/3.png)
-![watt-tracker](../screenshots/4.png)
-![watt-tracker](../screenshots/5.png)
-![watt-tracker](../screenshots/6.png)
+### Watt Tracker React Frontend
 
-- How Kafka-UI looks
+- How Watt Tracker App Login Page =>
+![login](../screenshots/1.png)
+
+- How Watt Tracker App Dashboard Page =>
+![dashboard](../screenshots/2.png)
+
+- How Watt Tracker App Devices Page =>
+![devices](../screenshots/3.png)
+
+- How Watt Tracker App Usage Analytics Page =>
+![usage-analytics](../screenshots/4.png)
+
+- How Watt Tracker App Alerts Page =>
+![alerts](../screenshots/5.png)
+
+- How Watt Tracker App Settings Page =>
+![settings](../screenshots/6.png)
+
+
+### External Tools
+
+- How Kafka-UI looks =>
 ![kafka](../screenshots/kafka-ui.png)
 
-- How InfluxDB looks
+- How InfluxDB looks =>
 ![influxdb](../screenshots/influx-db.png)
 
-- How mailpit looks
+- How mailpit looks =>
 ![mailpit](../screenshots/mail.png)
 
 
