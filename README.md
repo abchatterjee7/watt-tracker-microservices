@@ -14,6 +14,23 @@ A comprehensive React frontend for the Watt Tracker microservices-based energy m
 - How eureka-services will look alike
 ![eureka](./screenshots/eureka.png)
 
+- How watt-tracker app looks
+![watt-tracker](./screenshots/1.png)
+![watt-tracker](./screenshots/2.png)
+![watt-tracker](./screenshots/3.png)
+![watt-tracker](./screenshots/4.png)
+![watt-tracker](./screenshots/5.png)
+![watt-tracker](./screenshots/6.png)
+
+- How Kafka-UI looks
+![kafka](./screenshots/kafka-ui.png)
+
+- How InfluxDB looks
+![influxdb](./screenshots/influx-db.png)
+
+- How mailpit looks
+![mailpit](./screenshots/mail.png)
+
 
 ## Features
 
