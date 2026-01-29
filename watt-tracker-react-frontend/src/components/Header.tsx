@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Bell, Search, User, Menu, X, Sun, Moon, LogOut } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
@@ -15,6 +15,7 @@ const Header = ({ onSidebarToggle, isSidebarOpen = true }: HeaderProps) => {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
+  const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
 
@@ -27,6 +28,67 @@ const Header = ({ onSidebarToggle, isSidebarOpen = true }: HeaderProps) => {
   ];
 
   const currentPage = navigation.find(item => item.href === location.pathname)?.name || 'Dashboard';
+
+  // Search suggestions
+  const searchSuggestions = [
+    'Living Room Light',
+    'Kitchen Thermostat',
+    'Bedroom Camera',
+    'Front Door Lock',
+    'Smart Speaker',
+    'Energy Usage',
+    'Device Settings',
+    'Alert History'
+  ];
+
+  const filteredSuggestions = searchSuggestions.filter(suggestion =>
+    suggestion.toLowerCase().includes(searchQuery.toLowerCase())
+  ).slice(0, 5);
+
+  // Search handlers
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Option 1: If on Devices page, filter devices
+      if (location.pathname === '/devices') {
+        // Emit custom event for device filtering
+        window.dispatchEvent(new CustomEvent('searchDevices', { 
+          detail: { query: searchQuery.trim() } 
+        }));
+      } else {
+        // Option 2: Navigate to search results page
+        navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      }
+      setShowSearchSuggestions(false);
+    }
+  };
+
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    setShowSearchSuggestions(value.length > 0);
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setSearchQuery(suggestion);
+    setShowSearchSuggestions(false);
+    if (location.pathname === '/devices') {
+      window.dispatchEvent(new CustomEvent('searchDevices', { 
+        detail: { query: suggestion } 
+      }));
+    } else {
+      navigate(`/search?q=${encodeURIComponent(suggestion)}`);
+    }
+  };
+
+  // Close search suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setShowSearchSuggestions(false);
+    if (showSearchSuggestions) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [showSearchSuggestions]);
 
   const notifications = [
     { id: 1, message: 'Energy threshold exceeded', time: '2 hours ago', read: false },
@@ -64,16 +126,44 @@ const Header = ({ onSidebarToggle, isSidebarOpen = true }: HeaderProps) => {
           {/* Center - Search bar */}
           <div className="flex-1 max-w-lg mx-2 md:mx-8">
             <div className="relative w-full">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 md:h-5 md:w-5 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="block w-full pl-9 md:pl-10 pr-3 py-1.5 md:py-2 border border-gray-300 rounded-md text-sm md:leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Search..."
-              />
+              <form onSubmit={handleSearch}>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Search className="h-4 w-4 md:h-5 md:w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={handleSearchInputChange}
+                    onFocus={() => setShowSearchSuggestions(searchQuery.length > 0)}
+                    className="block w-full pl-9 md:pl-10 pr-3 py-1.5 md:py-2 border border-gray-300 rounded-md text-sm md:leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Search devices, settings, usage..."
+                  />
+                </div>
+              </form>
+
+              {/* Search Suggestions Dropdown */}
+              {showSearchSuggestions && filteredSuggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                  <div className="max-h-64 overflow-y-auto">
+                    {filteredSuggestions.map((suggestion, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSuggestionClick(suggestion)}
+                        className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none border-b border-gray-100 last:border-b-0"
+                      >
+                        <div className="flex items-center">
+                          <Search className="h-4 w-4 text-gray-400 mr-2" />
+                          {suggestion}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="px-3 py-2 text-xs text-gray-500 border-t border-gray-200">
+                    Press Enter to search all results
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

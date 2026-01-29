@@ -14,7 +14,6 @@ public class CorsFilterConfig {
         CorsConfiguration corsConfig = new CorsConfiguration();
         corsConfig.setAllowCredentials(true);
         corsConfig.addAllowedOrigin("http://localhost:5173");
-        corsConfig.addAllowedOrigin("http://localhost:3000");
         corsConfig.addAllowedHeader("*");
         corsConfig.addAllowedMethod("*");
 

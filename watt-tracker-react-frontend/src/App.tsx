@@ -10,6 +10,7 @@ import Devices from './pages/Devices';
 import UsageAnalytics from './pages/Usage';
 import Alerts from './pages/Alerts';
 import Settings from './pages/Settings';
+import SearchResults from './pages/SearchResults';
 import Help from './pages/Help';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
@@ -61,6 +62,13 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <Settings />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/search" element={
+              <ProtectedRoute>
+                <Layout>
+                  <SearchResults />
                 </Layout>
               </ProtectedRoute>
             } />

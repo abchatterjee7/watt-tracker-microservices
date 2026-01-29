@@ -8,8 +8,10 @@ import { useAuth } from '../contexts/AuthContext';
 const Devices = () => {
   const { user } = useAuth();
   const [devices, setDevices] = useState<Device[]>([]);
+  const [filteredDevices, setFilteredDevices] = useState<Device[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const [newDevice, setNewDevice] = useState({
     name: '',
     type: DeviceType.SPEAKER as DeviceType,
@@ -26,6 +28,7 @@ const Devices = () => {
         // Get devices for authenticated user
         const devicesData = await deviceApi.getAllDevicesForUser(user.id);
         setDevices(devicesData);
+        setFilteredDevices(devicesData);
       } catch (error: any) {
         console.error('Failed to load devices:', error);
         
@@ -43,6 +46,20 @@ const Devices = () => {
 
     loadDevices();
   }, [user]);
+
+  // Filter devices based on search query
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredDevices(devices);
+    } else {
+      const filtered = devices.filter(device =>
+        device.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        device.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        device.type.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredDevices(filtered);
+    }
+  }, [devices, searchQuery]);
 
   const handleAddDevice = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,11 +107,11 @@ const Devices = () => {
   };
 
   const deviceTypeIcons: Record<DeviceType, string> = {
-    [DeviceType.SPEAKER]: '�',
+    [DeviceType.SPEAKER]: '🔊',
     [DeviceType.CAMERA]: '📹',
     [DeviceType.THERMOSTAT]: '🌡️',
     [DeviceType.LIGHT]: '💡',
-    [DeviceType.LOCK]: '�',
+    [DeviceType.LOCK]: '🔒',
     [DeviceType.DOORBELL]: '🔔'
   };
 
@@ -129,9 +146,29 @@ const Devices = () => {
         </button>
       </div>
 
+      {/* Search Bar */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <input
+          type="text"
+          placeholder="Search devices by name, location, or type..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* Search Status */}
+      {searchQuery && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <p className="text-sm text-blue-800">
+            Found {filteredDevices.length} device{filteredDevices.length !== 1 ? 's' : ''} matching "{searchQuery}"
+          </p>
+        </div>
+      )}
+
       {/* Device Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {devices.map((device) => (
+        {filteredDevices.map((device) => (
           <div key={device.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
             <div className="p-6">
               <div className="flex items-start justify-between mb-4">
