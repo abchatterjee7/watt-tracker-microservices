@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Bell, Search, User, Menu, X, Sun, Moon, LogOut } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -11,6 +11,7 @@ interface HeaderProps {
 
 const Header = ({ onSidebarToggle, isSidebarOpen = true }: HeaderProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
@@ -120,7 +121,7 @@ const Header = ({ onSidebarToggle, isSidebarOpen = true }: HeaderProps) => {
                       >
                         <div className="flex items-start">
                           <div className="flex-1">
-                            <p className="text-sm text-gray-900">{notification.message}</p>
+                            <p className="text-sm text-gray-500">{notification.message}</p>
                             <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
                           </div>
                           {!notification.read && (
@@ -172,19 +173,19 @@ const Header = ({ onSidebarToggle, isSidebarOpen = true }: HeaderProps) => {
                   </div>
                   <div className="py-2">
                     <button
-                      onClick={() => window.location.href = '/settings'}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Profile Settings
-                    </button>
-                    <button
-                      onClick={() => window.location.href = '/settings'}
+                      onClick={() => {
+                        navigate('/settings');
+                        setShowProfile(false);
+                      }}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       Account Settings
                     </button>
                     <button
-                      onClick={() => window.location.href = '/settings'}
+                      onClick={() => {
+                        navigate('/help');
+                        setShowProfile(false);
+                      }}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       Help & Support

@@ -45,11 +45,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const validateToken = async (authToken: string) => {
     try {
-      const response = await userApi.validateToken(authToken);
-      if (response.valid && response.user) {
-        setUser(response.user);
+      // First try to decode JWT locally to avoid API call on refresh
+      const decodedToken = decodeJWT(authToken);
+      if (decodedToken && decodedToken.userId) {
+        // Create basic user object from token
+        const user: User = {
+          id: decodedToken.userId,
+          email: '', // Will be populated from API if needed
+          name: 'User',
+          surname: '',
+          address: '',
+          alerting: false,
+          energyAlertingThreshold: 0
+        };
+        
+        setUser(user);
         setToken(authToken);
-        localStorage.setItem('authToken', authToken);
+        
+        // Optionally fetch full user data in background
+        fetchUserData(decodedToken.userId, authToken);
       } else {
         // Token is invalid, clear it
         localStorage.removeItem('authToken');
@@ -66,6 +80,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const decodeJWT = (token: string) => {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      return JSON.parse(jsonPayload);
+    } catch (error) {
+      console.error('Failed to decode JWT:', error);
+      return null;
+    }
+  };
+
+  const fetchUserData = async (userId: number, _token: string) => {
+    try {
+      const userData = await userApi.getUserById(userId);
+      setUser(userData);
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+      // Don't logout on failure, keep basic user info from token
+    }
+  };
+
   const login = async (username: string, password: string): Promise<{ success: boolean; message: string }> => {
     try {
       const response = await userApi.login(username, password);
@@ -75,7 +116,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const user: User = {
           id: response.userId,
           email: username, // Using username as email for now
-          name: username,
+          name: username.split('@')[0] || 'User', // Extract name from email
           surname: '',
           address: '',
           alerting: false,

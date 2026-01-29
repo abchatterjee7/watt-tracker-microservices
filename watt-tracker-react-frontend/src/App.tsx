@@ -10,6 +10,7 @@ import Devices from './pages/Devices';
 import UsageAnalytics from './pages/Usage';
 import Alerts from './pages/Alerts';
 import Settings from './pages/Settings';
+import Help from './pages/Help';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import CookiePolicy from './pages/CookiePolicy';
@@ -60,6 +61,13 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <Settings />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/help" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Help />
                 </Layout>
               </ProtectedRoute>
             } />

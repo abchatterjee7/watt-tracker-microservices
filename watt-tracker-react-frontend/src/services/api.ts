@@ -22,14 +22,17 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      toast.error('Session expired. Please login again.');
-      localStorage.removeItem('authToken');
-      window.location.href = '/login';
-    } else if (error.response?.status >= 500) {
-      toast.error('Server error. Please try again later.');
-    } else if (error.code === 'NETWORK_ERROR') {
-      toast.error('Network error. Please check your connection.');
+    // Only handle errors for actual API requests (not navigation)
+    if (error.config && error.config.url) {
+      if (error.response?.status === 401) {
+        toast.error('Session expired. Please login again.');
+        localStorage.removeItem('authToken');
+        window.location.href = '/login';
+      } else if (error.response?.status >= 500) {
+        toast.error('Server error. Please try again later.');
+      } else if (error.code === 'NETWORK_ERROR') {
+        toast.error('Network error. Please check your connection.');
+      }
     }
     return Promise.reject(error);
   }
