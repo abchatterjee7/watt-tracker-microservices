@@ -1,4 +1,4 @@
-# Watt Tracker React Frontend
+# Watt Tracker
 
 A comprehensive React frontend for the Watt Tracker microservices-based energy monitoring system. This application provides real-time energy consumption tracking, device management, and intelligent alerting for household energy usage.
 
