@@ -1,18 +1,24 @@
 package org.aadi.alert_service.service;
 
+import org.aadi.alert_service.entity.Alert;
+import org.aadi.alert_service.repository.AlertRepository;
 import org.aadi.kafka.event.AlertingEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Slf4j
 @Service
 public class AlertService {
 
     private final EmailService emailService;
+    private final AlertRepository alertRepository;
 
-    public AlertService(EmailService emailService) {
+    public AlertService(EmailService emailService, AlertRepository alertRepository) {
         this.emailService = emailService;
+        this.alertRepository = alertRepository;
     }
 
     @KafkaListener(topics = "energy-alerts", groupId = "alert-service")
@@ -29,5 +35,9 @@ public class AlertService {
                 subject,
                 message,
                 alertingEvent.getUserId());
+    }
+
+    public List<Alert> getAlertsForUser(Long userId) {
+        return alertRepository.findByUserId(userId);
     }
 }

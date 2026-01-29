@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { userApi } from '../services/api';
 import type { User } from '../types';
+import toast from 'react-hot-toast';
 
 interface AuthContextType {
   user: User | null;
@@ -9,7 +10,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (username: string, password: string) => Promise<{ success: boolean; message: string }>;
-  register: (userData: Omit<User, 'id'>) => Promise<{ success: boolean; message: string }>;
+  register: (userData: Omit<User, 'id'> & { password: string }) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
 }
 
@@ -84,30 +85,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(user);
         setToken(response.token);
         localStorage.setItem('authToken', response.token);
+        toast.success('Login successful! Welcome back.');
         return { success: true, message: 'Login successful' };
       } else {
+        toast.error('Login failed. Please check your credentials.');
         return { success: false, message: 'Login failed' };
       }
     } catch (error: any) {
       const message = error.response?.data?.error || 'Login failed. Please try again.';
+      toast.error(message);
       return { success: false, message };
     }
   };
 
-  const register = async (userData: Omit<User, 'id'>): Promise<{ success: boolean; message: string }> => {
+  const register = async (userData: Omit<User, 'id'> & { password: string }): Promise<{ success: boolean; message: string }> => {
     try {
       const response = await userApi.register(userData);
       
       if (response.user) {
         setUser(response.user);
+        toast.success('Registration successful! Welcome to Watt Tracker.');
         // Auto-login after registration
-        const loginResult = await login(userData.email, 'password123'); // Default password for demo
+        const loginResult = await login(userData.email, userData.password);
         return loginResult;
       } else {
+        toast.error(response.message || 'Registration failed');
         return { success: false, message: response.message };
       }
     } catch (error: any) {
       const message = error.response?.data?.message || 'Registration failed. Please try again.';
+      toast.error(message);
       return { success: false, message };
     }
   };
@@ -116,6 +123,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
     setToken(null);
     localStorage.removeItem('authToken');
+    toast.success('Logged out successfully');
   };
 
   const value: AuthContextType = {

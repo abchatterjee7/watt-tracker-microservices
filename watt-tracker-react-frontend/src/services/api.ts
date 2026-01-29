@@ -1,5 +1,6 @@
 import axios from 'axios';
 import type { User, Device, Usage, Alert } from '../types';
+import toast from 'react-hot-toast';
 
 // Service URLs - All calls go through API Gateway
 const API_GATEWAY_URL = import.meta.env.VITE_API_URL || 'http://localhost:9090';
@@ -16,6 +17,23 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Add response interceptor for error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      toast.error('Session expired. Please login again.');
+      localStorage.removeItem('authToken');
+      window.location.href = '/login';
+    } else if (error.response?.status >= 500) {
+      toast.error('Server error. Please try again later.');
+    } else if (error.code === 'NETWORK_ERROR') {
+      toast.error('Network error. Please check your connection.');
+    }
+    return Promise.reject(error);
+  }
+);
 
 // User Service APIs
 export const userApi = {
@@ -40,7 +58,7 @@ export const userApi = {
   // Authentication APIs
   login: async (username: string, password: string): Promise<{ token: string; type: string; userId: number; username: string; role: string }> => {
     const response = await api.post(`${API_GATEWAY_URL}/user-service/api/v1/auth/login`, {
-      username,
+      email: username,
       password
     });
     return response.data;
