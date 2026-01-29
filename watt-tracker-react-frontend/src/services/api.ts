@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { User, Device, Usage, Alert } from '../types';
 
 // Service URLs - All calls go through API Gateway
-const API_GATEWAY_URL = 'http://localhost:9090';
+const API_GATEWAY_URL = import.meta.env.VITE_API_URL || 'http://localhost:9090';
 
 const api = axios.create({
   timeout: 10000,

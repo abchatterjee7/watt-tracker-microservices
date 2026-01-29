@@ -109,8 +109,7 @@ The frontend connects to the following microservices:
 Create a `.env` file in the root directory:
 
 ```env
-VITE_API_BASE_URL=http://localhost:8086/api/v1
-VITE_WS_URL=ws://localhost:8086/ws
+VITE_API_BASE_URL=http://localhost:9090
 ```
 
 ### API Endpoints
