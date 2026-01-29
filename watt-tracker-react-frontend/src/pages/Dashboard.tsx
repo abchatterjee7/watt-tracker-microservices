@@ -235,7 +235,7 @@ const Dashboard = () => {
                     <p className="text-sm text-gray-600">{device.location}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-semibold text-gray-900">{device.energyConsumed} kWh</p>
+                    <p className="text-lg font-semibold text-gray-900">{Number(device.energyConsumed).toFixed(2)} kWh</p>
                     <p className="text-sm text-gray-600">Last 3 days</p>
                   </div>
                 </div>

@@ -165,7 +165,7 @@ const Devices = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Energy Usage</span>
                   <span className={`text-sm font-medium px-2 py-1 rounded-full ${getConsumptionColor(device.energyConsumed || 0)}`}>
-                    {device.energyConsumed || 0} kWh
+                    {Number(device.energyConsumed || 0).toFixed(2)} kWh
                   </span>
                 </div>
 

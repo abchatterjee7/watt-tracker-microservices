@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Calendar, TrendingUp, Download } from 'lucide-react';
-import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import type { Usage } from '../types';
 import { usageApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -68,25 +68,7 @@ const UsageAnalytics = () => {
     { date: 'Sun', consumption: 0, cost: 0 }
   ];
 
-  // Generate hourly pattern from real usage data
-  const hourlyPatternData = usage?.devices?.length ? [
-    { hour: '00:00', avg: 1.2, peak: 2.1 },
-    { hour: '04:00', avg: 0.8, peak: 1.5 },
-    { hour: '08:00', avg: 3.5, peak: 5.8 },
-    { hour: '12:00', avg: 4.2, peak: 7.2 },
-    { hour: '16:00', avg: 3.8, peak: 6.1 },
-    { hour: '20:00', avg: 5.1, peak: 8.9 },
-    { hour: '23:00', avg: 1.8, peak: 3.2 }
-  ] : [
-    { hour: '00:00', avg: 0, peak: 0 },
-    { hour: '04:00', avg: 0, peak: 0 },
-    { hour: '08:00', avg: 0, peak: 0 },
-    { hour: '12:00', avg: 0, peak: 0 },
-    { hour: '16:00', avg: 0, peak: 0 },
-    { hour: '20:00', avg: 0, peak: 0 },
-    { hour: '23:00', avg: 0, peak: 0 }
-  ];
-
+  
   // Generate monthly comparison from real usage data
   const totalConsumption = usage?.devices?.reduce((sum, device) => sum + (device.energyConsumed || 0), 0) || 0;
   const monthlyComparisonData = totalConsumption ? [
@@ -116,19 +98,19 @@ const UsageAnalytics = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-[85vw] mx-auto space-y-1 sm:space-y-6 overflow-x-hidden">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Energy Usage Analytics</h1>
-          <p className="text-gray-600">Detailed insights into your energy consumption patterns</p>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-1 sm:space-y-0 px-0 sm:px-0">
+        <div className="text-center sm:text-left">
+          <h1 className="text-xs sm:text-xl md:text-2xl font-bold text-gray-900 truncate">Energy Usage Analytics</h1>
+          <p className="text-xs sm:text-sm md:text-base text-gray-600 truncate">Detailed insights into your energy consumption patterns</p>
         </div>
         
-        <div className="flex space-x-3">
+        <div className="flex flex-col space-y-1 sm:flex-row sm:space-y-0 sm:space-x-3 px-0 sm:px-0">
           <select
             value={selectedPeriod}
             onChange={(e) => setSelectedPeriod(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
           >
             <option value="7">Last 7 days</option>
             <option value="30">Last 30 days</option>
@@ -136,113 +118,122 @@ const UsageAnalytics = () => {
             <option value="365">Last year</option>
           </select>
           
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            <Download className="w-4 h-4 mr-2" />
-            Export Report
+          <button className="flex items-center justify-center px-1 py-0.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors w-full sm:w-auto">
+            <Download className="w-2 h-2 mr-1" />
+            <span className="hidden sm:inline">Export</span>
+            <span className="sm:hidden">Export</span>
           </button>
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
+      <div className="grid grid-cols-1 gap-0.5 sm:grid-cols-2 lg:grid-cols-4 sm:gap-2 md:gap-6 px-0 sm:px-0">
+        <div className="bg-white rounded shadow p-1 sm:p-1.5 md:p-4 lg:p-6">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Total Consumption</p>
-              <p className="text-2xl font-bold text-gray-900">{totalConsumption.toFixed(1)} kWh</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-gray-600 truncate">Total Consumption</p>
+              <p className="text-xs sm:text-sm md:text-2xl font-bold text-gray-900 truncate">{totalConsumption.toFixed(1)} kWh</p>
             </div>
-            <TrendingUp className="w-8 h-8 text-blue-600" />
+            <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-8 md:h-8 text-blue-600 flex-shrink-0 ml-1" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded shadow p-1 sm:p-1.5 md:p-4 lg:p-6">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Estimated Cost</p>
-              <p className="text-2xl font-bold text-gray-900">₹{estimatedCost.toFixed(2)}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-gray-600 truncate">Estimated Cost</p>
+              <p className="text-xs sm:text-sm md:text-2xl font-bold text-gray-900 truncate">₹{estimatedCost.toFixed(2)}</p>
             </div>
-            <div className="text-2xl font-bold text-green-600">💰</div>
+            <div className="text-xs sm:text-sm md:text-2xl font-bold text-green-600 flex-shrink-0 ml-1">💰</div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded shadow p-1 sm:p-1.5 md:p-4 lg:p-6">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Daily Average</p>
-              <p className="text-2xl font-bold text-gray-900">{(totalConsumption / 7).toFixed(1)} kWh</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-gray-600 truncate">Daily Average</p>
+              <p className="text-xs sm:text-sm md:text-2xl font-bold text-gray-900 truncate">{(totalConsumption / 7).toFixed(1)} kWh</p>
             </div>
-            <Calendar className="w-8 h-8 text-yellow-600" />
+            <Calendar className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-8 md:h-8 text-yellow-600 flex-shrink-0 ml-1" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded shadow p-1 sm:p-1.5 md:p-4 lg:p-6">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Peak Hour</p>
-              <p className="text-2xl font-bold text-gray-900">8:00 PM</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-gray-600 truncate">Peak Hour</p>
+              <p className="text-xs sm:text-sm md:text-2xl font-bold text-gray-900 truncate">8:00 PM</p>
             </div>
-            <div className="text-2xl">⚡</div>
+            <div className="text-xs sm:text-sm md:text-2xl flex-shrink-0 ml-1">⚡</div>
           </div>
         </div>
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="space-y-1 sm:space-y-4 md:space-y-6 px-0 sm:px-0">
         {/* Daily Usage Chart */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Daily Energy Consumption</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={dailyUsageData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Area type="monotone" dataKey="consumption" stackId="1" stroke="#3B82F6" fill="#3B82F6" name="kWh" />
-              <Area type="monotone" dataKey="cost" stackId="2" stroke="#10B981" fill="#10B981" name="Cost (₹)" />
-            </AreaChart>
-          </ResponsiveContainer>
+        <div className="bg-white rounded shadow p-1 sm:p-1.5 md:p-4 lg:p-6 overflow-hidden">
+          <h3 className="text-xs sm:text-sm md:text-base lg:text-lg font-semibold text-gray-900 mb-0.5 sm:mb-1 md:mb-3 lg:mb-4">Daily Energy Consumption</h3>
+          <div className="w-full max-w-full">
+            <div className="h-20 sm:h-32 md:h-48 lg:h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={dailyUsageData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" fontSize={5} tick={{ fontSize: 10 }} />
+                  <YAxis fontSize={5} tick={{ fontSize: 10 }} />
+                  <Tooltip />
+                  <Area type="monotone" dataKey="consumption" stroke="#3B82F6" fill="#93BBFC" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         </div>
 
-        {/* Hourly Pattern Chart */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Hourly Usage Pattern</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={hourlyPatternData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="hour" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="avg" stroke="#3B82F6" strokeWidth={2} name="Average (kWh)" />
-              <Line type="monotone" dataKey="peak" stroke="#EF4444" strokeWidth={2} name="Peak (kWh)" />
-            </LineChart>
-          </ResponsiveContainer>
+        {/* Device Usage Chart */}
+        <div className="bg-white rounded shadow p-1 sm:p-1.5 md:p-4 lg:p-6 overflow-hidden">
+          <h3 className="text-xs sm:text-sm md:text-base lg:text-lg font-semibold text-gray-900 mb-0.5 sm:mb-1 md:mb-3 lg:mb-4">Device Breakdown</h3>
+          <div className="w-full max-w-full">
+            <div className="h-20 sm:h-32 md:h-48 lg:h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={usage?.devices?.map((device) => ({ device: device.name, consumption: Number(device.energyConsumed || 0).toFixed(2) }))}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="device" fontSize={5} tick={{ fontSize: 10 }} />
+                  <YAxis fontSize={5} tick={{ fontSize: 10 }} />
+                  <Tooltip />
+                  <Bar dataKey="consumption" fill="#3B82F6" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* Monthly Comparison */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Comparison</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={monthlyComparisonData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="current" fill="#3B82F6" name="Current Month (kWh)" />
-            <Bar dataKey="previous" fill="#10B981" name="Previous Month (kWh)" />
-          </BarChart>
-        </ResponsiveContainer>
+        {/* Monthly Comparison */}
+        <div className="bg-white rounded shadow p-1 sm:p-1.5 md:p-4 lg:p-6 overflow-hidden">
+          <h3 className="text-xs sm:text-sm md:text-base lg:text-lg font-semibold text-gray-900 mb-0.5 sm:mb-1 md:mb-3 lg:mb-4">Monthly Comparison</h3>
+          <div className="w-full max-w-full">
+            <div className="h-24 sm:h-40 md:h-56 lg:h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={monthlyComparisonData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" fontSize={5} tick={{ fontSize: 10 }} />
+                  <YAxis fontSize={5} tick={{ fontSize: 10 }} />
+                  <Tooltip />
+                  <Legend wrapperStyle={{ fontSize: '12px' }} />
+                  <Bar dataKey="current" fill="#3B82F6" name="Current Month" />
+                  <Bar dataKey="previous" fill="#10B981" name="Previous Month" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Device Breakdown */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Device Consumption Breakdown</h3>
+      <div className="bg-white rounded shadow px-0 sm:px-0">
+        <div className="p-1 sm:p-1.5 md:p-6">
+          <h3 className="text-xs sm:text-sm md:text-lg font-semibold text-gray-900 mb-0.5 sm:mb-1 md:mb-4">Device Consumption Breakdown</h3>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-gray-200 text-xs">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Device</th>

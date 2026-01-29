@@ -71,26 +71,26 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-8 px-4 sm:py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-md">
         <div className="flex justify-center">
           <div className="flex items-center">
             <img src="./logo.png" className="w-8 h-8 mr-2" alt=""/>
-            <span className="ml-2 text-2xl font-bold text-gray-900">Watt Tracker</span>
+            <span className="ml-2 text-xl sm:text-2xl font-bold text-gray-900">Watt Tracker</span>
           </div>
         </div>
         
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <h2 className="mt-4 sm:mt-6 text-center text-2xl sm:text-3xl font-extrabold text-gray-900">
           {isRegistering ? 'Create your account' : 'Sign in to your account'}
         </h2>
         
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-xs sm:text-sm text-gray-600 px-4">
           {isRegistering ? 'Start monitoring your energy consumption' : 'Welcome back! Please login to continue'}
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+      <div className="mt-6 sm:mt-8 mx-auto w-full max-w-md">
+        <div className="bg-white py-6 sm:py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">

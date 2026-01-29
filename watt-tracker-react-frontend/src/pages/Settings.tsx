@@ -48,61 +48,61 @@ const Settings = () => {
   };
 
   const renderProfileTab = () => (
-    <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h3>
-        <form onSubmit={handleProfileUpdate} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="space-y-1 sm:space-y-6 px-0.5 sm:px-0">
+      <div className="bg-white rounded shadow p-1.5 sm:p-2 md:p-6">
+        <h3 className="text-xs sm:text-sm md:text-lg font-semibold text-gray-900 mb-0.5 sm:mb-1 md:mb-4">Personal Information</h3>
+        <form onSubmit={handleProfileUpdate} className="space-y-1 sm:space-y-4">
+          <div className="grid grid-cols-1 gap-0.5 sm:gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+              <label className="block text-xs font-medium text-gray-700 mb-0.5">First Name</label>
               <input
                 type="text"
                 value={userProfile.name}
                 onChange={(e) => setUserProfile(prev => ({ ...prev, name: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-1 py-0.5 sm:px-3 sm:py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+              <label className="block text-xs font-medium text-gray-700 mb-0.5">Last Name</label>
               <input
                 type="text"
                 value={userProfile.surname}
                 onChange={(e) => setUserProfile(prev => ({ ...prev, surname: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-1 py-0.5 sm:px-3 sm:py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+            <label className="block text-xs font-medium text-gray-700 mb-0.5">Email Address</label>
             <input
               type="email"
               value={userProfile.email}
               onChange={(e) => setUserProfile(prev => ({ ...prev, email: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-1 py-0.5 sm:px-3 sm:py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+            <label className="block text-xs font-medium text-gray-700 mb-0.5">Address</label>
             <textarea
               value={userProfile.address}
               onChange={(e) => setUserProfile(prev => ({ ...prev, address: e.target.value }))}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={2}
+              className="w-full px-1 py-0.5 sm:px-3 sm:py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
             />
           </div>
 
-          <div className="flex space-x-3">
+          <div className="flex flex-col space-y-0.5 sm:flex-row sm:space-y-0 sm:space-x-3">
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-1.5 py-0.5 sm:px-4 sm:py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors w-full sm:w-auto text-xs"
             >
               Save Changes
             </button>
             <button
               type="button"
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+              className="px-1.5 py-0.5 sm:px-4 sm:py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors w-full sm:w-auto text-xs"
             >
               Cancel
             </button>
@@ -263,30 +263,31 @@ const Settings = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600">Manage your account and application settings</p>
+    <div className="w-full max-w-[90vw] mx-auto space-y-1 sm:space-y-6 overflow-x-hidden">
+      <div className="px-0.5 sm:px-0 text-center sm:text-left">
+        <h1 className="text-sm sm:text-xl md:text-2xl font-bold text-gray-900 truncate">Settings</h1>
+        <p className="text-xs sm:text-sm md:text-base text-gray-600 truncate">Manage your account and application settings</p>
       </div>
 
-      <div className="flex space-x-6">
+      <div className="flex flex-col space-y-1 sm:space-y-4 lg:flex-row lg:space-x-6 lg:space-y-0 px-0.5 sm:px-0">
         {/* Sidebar */}
-        <div className="w-64">
-          <nav className="space-y-1">
+        <div className="w-full lg:w-64">
+          <nav className="flex flex-row lg:flex-col lg:space-y-1 space-x-0.5 lg:space-x-0 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
+                  className={`flex items-center px-1 lg:px-4 py-0.5 lg:py-3 text-xs font-medium rounded transition-colors whitespace-nowrap flex-shrink-0 ${
                     activeTab === tab.id
                       ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-700'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 >
-                  <Icon className="w-5 h-5 mr-3" />
-                  {tab.name}
+                  <Icon className="w-2 h-2 lg:w-5 lg:h-5 mr-0.5 lg:mr-2" />
+                  <span className="hidden sm:inline text-xs sm:text-sm">{tab.name}</span>
+                  <span className="sm:hidden text-xs">{tab.name.split(' ')[0]}</span>
                 </button>
               );
             })}
@@ -294,7 +295,7 @@ const Settings = () => {
         </div>
 
         {/* Content */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           {renderContent()}
         </div>
       </div>
