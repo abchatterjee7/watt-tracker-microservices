@@ -46,8 +46,11 @@ A comprehensive React frontend for the Watt Tracker microservices-based energy m
 - How InfluxDB looks =>
 ![influxdb](./screenshots/influx-db.png)
 
-- How mailpit looks =>
+- How Mailpit looks =>
 ![mailpit](./screenshots/mail.png)
+
+- How Docker looks =>
+![docker](./screenshots/docker.png)
 
 
 ## Features
