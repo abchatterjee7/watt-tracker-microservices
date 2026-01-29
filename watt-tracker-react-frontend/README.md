@@ -208,6 +208,7 @@ For issues and questions:
 4. Check browser console for errors
 
 # MicroServices Port
+```
 device-service = 8081
 ingestion-service = 8082
 usage-service = 8083
@@ -218,12 +219,14 @@ user-service = 8086
 api-gateway = 9090
 eureka = 8761
 config-service = 8888
+```
 
 # After running project find
-
+```
 Mysql => workbench with root/password
 Mailpit => http://localhost:8025/
 Kafka UI => http://localhost:8070/
 InfluxDB => http://localhost:8072/ with admin/admin123
 Eureka => http://localhost:8761
 Frontend of watt-tracker App => http://localhost:5173/login
+```

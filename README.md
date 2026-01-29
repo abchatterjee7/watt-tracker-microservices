@@ -3,16 +3,16 @@
 A comprehensive React frontend for the Watt Tracker microservices-based energy monitoring system. This application provides real-time energy consumption tracking, device management, and intelligent alerting for household energy usage.
 
 - How to calculate wattage and price inside watt-tracker-microservices
-![power](../screenshots/power.png)
+![power](./screenshots/power.png)
 
 - The requirements and assumptions made for the watt-tracker-microservices
-![requirements](../screenshots/requirements.png)
+![requirements](./screenshots/requirements.png)
 
 - How services will look alike
-![diagram](../screenshots/diagram.png)
+![diagram](./screenshots/diagram.png)
 
 - How eureka-services will look alike
-![eureka](../screenshots/eureka.png)
+![eureka](./screenshots/eureka.png)
 
 
 ## Features
@@ -208,6 +208,7 @@ For issues and questions:
 4. Check browser console for errors
 
 # MicroServices Port
+```
 device-service = 8081
 ingestion-service = 8082
 usage-service = 8083
@@ -218,12 +219,14 @@ user-service = 8086
 api-gateway = 9090
 eureka = 8761
 config-service = 8888
+```
 
 # After running project find
-
+```
 Mysql => workbench with root/password
 Mailpit => http://localhost:8025/
 Kafka UI => http://localhost:8070/
 InfluxDB => http://localhost:8072/ with admin/admin123
 Eureka => http://localhost:8761
 Frontend of watt-tracker App => http://localhost:5173/login
+```
