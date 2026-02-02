@@ -31,6 +31,7 @@ public class User {
     private String address;
     private boolean alerting;
     private double energyAlertingThreshold;
+    private boolean emailNotifications;
     
     @Enumerated(EnumType.STRING)
     @Builder.Default

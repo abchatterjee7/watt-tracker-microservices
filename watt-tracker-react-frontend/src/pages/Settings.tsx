@@ -12,8 +12,9 @@ const Settings = () => {
     surname: 'Raj',
     email: 'aaditya.raj@example.com',
     address: 'CS Street, HiTech City, Hyderabad, Telangana 500001',
-    alerting: true,
-    energyAlertingThreshold: 100
+    alerting: false,
+    energyAlertingThreshold: 100,
+    emailNotifications: false
   });
 
   // Load user profile on component mount
@@ -78,6 +79,27 @@ const Settings = () => {
     } catch (error) {
       console.error('Failed to update profile:', error);
       toast.error('Failed to update profile. Please try again.');
+    }
+  };
+
+  const handleEmailNotificationToggle = async () => {
+    try {
+      const updatedProfile = { ...userProfile, emailNotifications: !userProfile.emailNotifications };
+      await userApi.updateUser(userProfile.id, updatedProfile);
+      setUserProfile(updatedProfile);
+      
+      // Update localStorage
+      const userData = localStorage.getItem('userData');
+      if (userData) {
+        const user = JSON.parse(userData);
+        const updatedUser = { ...user, ...updatedProfile };
+        localStorage.setItem('userData', JSON.stringify(updatedUser));
+      }
+      
+      toast.success(`Email notifications ${updatedProfile.emailNotifications ? 'enabled' : 'disabled'} successfully!`);
+    } catch (error) {
+      console.error('Failed to toggle email notifications:', error);
+      toast.error('Failed to update email notification settings. Please try again.');
     }
   };
 
@@ -218,6 +240,25 @@ const Settings = () => {
               onChange={(e) => handleThresholdChange(parseFloat(e.target.value))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+          </div>
+
+          <div className="flex items-center justify-between mt-4">
+            <div>
+              <p className="font-medium text-gray-900">Email Notifications</p>
+              <p className="text-sm text-gray-600">Receive alerts via email</p>
+            </div>
+            <button
+              onClick={handleEmailNotificationToggle}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                userProfile.emailNotifications ? 'bg-blue-600' : 'bg-gray-200'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  userProfile.emailNotifications ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
           </div>
         </div>
       </div>

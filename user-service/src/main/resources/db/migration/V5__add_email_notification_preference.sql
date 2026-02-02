@@ -1,0 +1,1 @@
+ALTER TABLE `user` ADD COLUMN `email_notifications` TINYINT(1) NOT NULL DEFAULT 0;

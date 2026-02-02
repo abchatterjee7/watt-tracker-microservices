@@ -56,7 +56,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           surname: '',
           address: '',
           alerting: false,
-          energyAlertingThreshold: 0
+          energyAlertingThreshold: 0,
+          emailNotifications: false
         };
         
         setUser(user);
@@ -120,7 +121,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           surname: '',
           address: '',
           alerting: false,
-          energyAlertingThreshold: 0
+          energyAlertingThreshold: 0,
+          emailNotifications: false
         };
         
         setUser(user);

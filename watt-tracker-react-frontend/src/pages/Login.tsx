@@ -44,8 +44,9 @@ const Login = () => {
           email: email,
           password,
           address: 'Default Address',
-          alerting: true,
-          energyAlertingThreshold: 100
+          alerting: false, // Default to false for opt-in behavior
+          energyAlertingThreshold: 100,
+          emailNotifications: false // Default to false for opt-in behavior
         };
 
         const result = await register(userData);

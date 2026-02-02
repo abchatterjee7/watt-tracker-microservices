@@ -1,6 +1,7 @@
 # Watt Tracker React Frontend
 
 A comprehensive React frontend for the Watt Tracker microservices-based energy monitoring system. This application provides real-time energy consumption tracking, device management, and intelligent alerting for household energy usage, and energy saving tips from AI model.
+- While running microservices, ensure user-service is running first, as it has mysql flyway and database setup.
 
 ## Screenshots
 
@@ -33,13 +34,13 @@ A comprehensive React frontend for the Watt Tracker microservices-based energy m
 ![usage-analytics](../screenshots/4.png)
 
 - How Watt Tracker App Alerts Page =>
-![alerts](../screenshots/5.png)
+![alerts](../screenshots/alerts.png)
 
 - How Watt Tracker App Settings Page =>
 ![settings](../screenshots/6.png)
 
 - How Watt Tracker App AI Tips in Insights Page =>
-![AI Tips](./screenshots/ai-tips.png)
+![AI Tips](../screenshots/insights.png)
 
 
 ### External Tools

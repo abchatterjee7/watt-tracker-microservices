@@ -36,19 +36,26 @@ const Insights = () => {
       setOverview(overviewData);
       setInsightLoading(false);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load insights:', error);
       
-      // Provide fallback data when API fails
+      // Check if it's a timeout error specifically
+      if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+        setError('AI service is taking longer than expected. Please wait while we generate your personalized tips...');
+        // Keep loading state true for timeout errors
+        return;
+      }
+      
+      // For other errors, provide fallback data
       const fallbackData = {
         userId: user?.id || 1,
-        tips: "AI service is currently taking longer than expected. Here are some general energy-saving tips:\n\n1. Turn off lights when not in use\n2. Use LED bulbs instead of incandescent\n3. Adjust your thermostat by 1-2 degrees\n4. Unplug devices when not in use\n5. Use power strips for electronics",
+        tips: "AI service is currently unavailable. Here are some general energy-saving tips:\n\n1. Turn off lights when not in use\n2. Use LED bulbs instead of incandescent\n3. Adjust your thermostat by 1-2 degrees\n4. Unplug devices when not in use\n5. Use power strips for electronics",
         energyUsage: 0
       };
       
       setSavingTips(fallbackData);
       setOverview(fallbackData);
-      setError('AI service is responding slowly. Showing general tips.');
+      setError('AI service is currently unavailable. Showing general tips.');
       setInsightLoading(false);
     }
   };

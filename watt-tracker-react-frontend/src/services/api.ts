@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 const API_GATEWAY_URL = import.meta.env.VITE_API_URL || 'http://localhost:9090';
 
 const api = axios.create({
-  timeout: 60000,
+  timeout: 300000, // Increased to 5 minutes for Ollama responses
 });
 
 // Add JWT token to requests

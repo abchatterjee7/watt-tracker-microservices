@@ -1,28 +1,42 @@
 import { useState, useEffect } from 'react';
 import { Bell, AlertTriangle, Clock, CheckCircle, Settings } from 'lucide-react';
-import { alertApi } from '../services/api';
+import { alertApi, userApi } from '../services/api';
 import type { Alert } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 
 const Alerts = () => {
   const { user } = useAuth();
   const [alertSettings, setAlertSettings] = useState({
-    thresholdEnabled: true,
+    thresholdEnabled: false,
     thresholdValue: 100,
-    anomalyDetection: true,
-    emailNotifications: true,
+    anomalyDetection: false,
+    emailNotifications: false,
     pushNotifications: false
   });
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Load real alerts from backend
+  // Load real alerts from backend and user preferences
   useEffect(() => {
     const loadAlerts = async () => {
       if (!user) return; // Don't load if user is not authenticated
       
       try {
         setLoading(true);
+        
+        // Load user preferences
+        const userData = await userApi.getUserById(user.id);
+        if (userData) {
+          setAlertSettings({
+            thresholdEnabled: userData.alerting,
+            thresholdValue: userData.energyAlertingThreshold,
+            anomalyDetection: false, // Default to false for now
+            emailNotifications: userData.emailNotifications,
+            pushNotifications: false
+          });
+        }
+        
+        // Load alerts
         const alertsData = await alertApi.getAlertsForUser(user.id);
         setAlerts(alertsData);
       } catch (error: any) {
@@ -30,7 +44,6 @@ const Alerts = () => {
         
         // Handle network errors gracefully
         if (error.code === 'NETWORK_ERROR' || error.message?.includes('Network Error')) {
-          console.log('Alert service not available - using empty data');
         }
         
         // Fallback to empty array if backend is not available
@@ -42,6 +55,53 @@ const Alerts = () => {
 
     loadAlerts();
   }, [user]);
+
+  const updateAlertPreference = async (field: 'alerting' | 'emailNotifications', value: boolean) => {
+    if (!user) return;
+    
+    try {
+      let updatedProfile;
+      
+      if (field === 'alerting') {
+        // When enabling alerts, always reset email notifications to false
+        updatedProfile = {
+          ...user,
+          [field]: value,
+          emailNotifications: false, // Always reset to false when alerting changes
+          energyAlertingThreshold: alertSettings.thresholdValue
+        };
+        
+        // Update local state for both alerting and email notifications
+        setAlertSettings(prev => ({ 
+          ...prev, 
+          thresholdEnabled: value,
+          emailNotifications: false // Reset email notifications in UI
+        }));
+      } else {
+        // For email notifications updates, proceed normally
+        updatedProfile = {
+          ...user,
+          [field]: value,
+          energyAlertingThreshold: alertSettings.thresholdValue
+        };
+        
+        // Update local state for email notifications only
+        setAlertSettings(prev => ({ ...prev, emailNotifications: value }));
+      }
+      await userApi.updateUser(user.id, updatedProfile);
+            
+      // Update user context
+      const userData = localStorage.getItem('userData');
+      if (userData) {
+        const currentUser = JSON.parse(userData);
+        const updatedUser = { ...currentUser, ...updatedProfile };
+        localStorage.setItem('userData', JSON.stringify(updatedUser));
+      }
+      
+    } catch (error) {
+      console.error(`Failed to update ${field}:`, error);
+    }
+  };
 
   const triggerAlertCheck = async () => {
     try {
@@ -166,7 +226,7 @@ const Alerts = () => {
           <h3 className="text-lg font-semibold text-gray-900">Quick Alert Settings</h3>
           <button
             onClick={triggerAlertCheck}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
           >
             <Bell className="w-4 h-4" />
             Trigger Alert Check
@@ -179,7 +239,7 @@ const Alerts = () => {
               <p className="text-sm text-gray-600">Alert when consumption exceeds limit</p>
             </div>
             <button
-              onClick={() => setAlertSettings(prev => ({ ...prev, thresholdEnabled: !prev.thresholdEnabled }))}
+              onClick={() => updateAlertPreference('alerting', !alertSettings.thresholdEnabled)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                 alertSettings.thresholdEnabled ? 'bg-blue-600' : 'bg-gray-200'
               }`}
@@ -192,32 +252,14 @@ const Alerts = () => {
             </button>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div>
-              <p className="font-medium text-gray-900">Anomaly Detection</p>
-              <p className="text-sm text-gray-600">Detect unusual consumption patterns</p>
-            </div>
-            <button
-              onClick={() => setAlertSettings(prev => ({ ...prev, anomalyDetection: !prev.anomalyDetection }))}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                alertSettings.anomalyDetection ? 'bg-blue-600' : 'bg-gray-200'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  alertSettings.anomalyDetection ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-          </div>
-
+          {alertSettings.thresholdEnabled && (
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div>
               <p className="font-medium text-gray-900">Email Notifications</p>
               <p className="text-sm text-gray-600">Receive alerts via email</p>
             </div>
             <button
-              onClick={() => setAlertSettings(prev => ({ ...prev, emailNotifications: !prev.emailNotifications }))}
+              onClick={() => updateAlertPreference('emailNotifications', !alertSettings.emailNotifications)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                 alertSettings.emailNotifications ? 'bg-blue-600' : 'bg-gray-200'
               }`}
@@ -229,6 +271,7 @@ const Alerts = () => {
               />
             </button>
           </div>
+          )}
         </div>
       </div>
 

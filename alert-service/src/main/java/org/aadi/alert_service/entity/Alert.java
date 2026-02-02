@@ -26,4 +26,15 @@ public class Alert {
     private Long userId;
     private LocalDateTime createdAt;
     private boolean sent;
+    private String type;
+    private String severity;
+    private String message;
+    private Double value;
+    private Double threshold;
+    private Double expectedValue;
+    private Double averageValue;
+    private String device;
+    private LocalDateTime timestamp;
+    private boolean acknowledged;
+    private String email;
 }

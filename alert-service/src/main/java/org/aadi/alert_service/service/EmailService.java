@@ -1,7 +1,5 @@
 package org.aadi.alert_service.service;
 
-import org.aadi.alert_service.entity.Alert;
-import org.aadi.alert_service.repository.AlertRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -13,12 +11,9 @@ import org.springframework.stereotype.Service;
 public class EmailService {
 
     private final JavaMailSender mailSender;
-    private final AlertRepository alertRepository;
 
-    public EmailService(JavaMailSender mailSender,
-                        AlertRepository alertRepository) {
+    public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
-        this.alertRepository = alertRepository;
     }
 
     public void sendEmail(String to,
@@ -35,27 +30,10 @@ public class EmailService {
 
         try {
             mailSender.send(message);
-
-            final Alert alertSent = Alert.builder()
-                    .sent(true)
-                    .createdAt(java.time.LocalDateTime.now())
-                    .userId(userId)
-                    .build();
-
-            alertRepository.saveAndFlush(alertSent);
-
+            log.info("Email sent successfully to: {}", to);
         } catch (MailException e) {
             log.error("Failed to send email to: {}", to, e);
-
-            final Alert alertSent = Alert.builder()
-                    .sent(false)
-                    .createdAt(java.time.LocalDateTime.now())
-                    .userId(userId)
-                    .build();
-            alertRepository.saveAndFlush(alertSent);
-            return;
+            throw e; // Re-throw to let the caller handle the failure
         }
-
-        log.info("Email sent to: {}", to);
     }
 }

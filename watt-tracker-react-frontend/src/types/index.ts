@@ -6,6 +6,7 @@ export interface User {
   address: string;
   alerting: boolean;
   energyAlertingThreshold: number;
+  emailNotifications: boolean;
 }
 
 export interface Device {

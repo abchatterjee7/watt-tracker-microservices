@@ -32,6 +32,7 @@ public class UserService {
                 .address(input.getAddress())
                 .alerting(input.isAlerting())
                 .energyAlertingThreshold(input.getEnergyAlertingThreshold())
+                .emailNotifications(input.isEmailNotifications())
                 .build();
 
         final User saved = userRepository.save(createdUser);
@@ -64,6 +65,7 @@ public class UserService {
         user.setAddress(dto.getAddress());
         user.setAlerting(dto.isAlerting());
         user.setEnergyAlertingThreshold(dto.getEnergyAlertingThreshold());
+        user.setEmailNotifications(dto.isEmailNotifications());
 
         userRepository.save(user);
     }
@@ -83,6 +85,7 @@ public class UserService {
                 .address(user.getAddress())
                 .alerting(user.isAlerting())
                 .energyAlertingThreshold(user.getEnergyAlertingThreshold())
+                .emailNotifications(user.isEmailNotifications())
                 .build();
     }
 }

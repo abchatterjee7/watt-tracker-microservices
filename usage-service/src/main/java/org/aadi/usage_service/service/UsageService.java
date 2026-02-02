@@ -193,7 +193,10 @@ public class UsageService {
                     continue;
                 }
                 userThresholdMap.put(userId, user.energyAlertingThreshold());
-                userEmailMap.put(userId, user.email());
+                // Only add to email map if user has email notifications enabled
+                if (user.emailNotifications()) {
+                    userEmailMap.put(userId, user.email());
+                }
             } catch (Exception e) {
                 log.warn("Failed to fetch user for ID: {}", userId);
             }

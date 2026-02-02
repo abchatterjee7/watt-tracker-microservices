@@ -21,4 +21,6 @@ public class UserDto {
     private boolean alerting;
     @JsonProperty("energyAlertingThreshold")
     private double energyAlertingThreshold;
+    @JsonProperty("emailNotifications")
+    private boolean emailNotifications;
 }
