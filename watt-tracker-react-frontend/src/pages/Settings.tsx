@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User, Bell, Zap, Shield, Database, HelpCircle } from 'lucide-react';
 import type { User as UserType } from '../types';
+import { userApi } from '../services/api';
+import toast from 'react-hot-toast';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('profile');
@@ -13,6 +15,23 @@ const Settings = () => {
     alerting: true,
     energyAlertingThreshold: 100
   });
+
+  // Load user profile on component mount
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      try {
+        const userData = localStorage.getItem('userData');
+        if (userData) {
+          const user = JSON.parse(userData);
+          const fullProfile = await userApi.getUserById(user.id);
+          setUserProfile(fullProfile);
+        }
+      } catch (error) {
+        console.error('Failed to load user profile:', error);
+      }
+    };
+    loadUserProfile();
+  }, []);
 
   const [notificationSettings, setNotificationSettings] = useState({
     emailNotifications: true,
@@ -42,9 +61,66 @@ const Settings = () => {
     { id: 'help', name: 'Help & Support', icon: HelpCircle }
   ];
 
-  const handleProfileUpdate = (e: React.FormEvent) => {
+  const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Profile updated:', userProfile);
+    try {
+      await userApi.updateUser(userProfile.id, userProfile);
+      
+      // Update localStorage with new profile data
+      const userData = localStorage.getItem('userData');
+      if (userData) {
+        const user = JSON.parse(userData);
+        const updatedUser = { ...user, ...userProfile };
+        localStorage.setItem('userData', JSON.stringify(updatedUser));
+      }
+      
+      toast.success('Profile updated successfully!');
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      toast.error('Failed to update profile. Please try again.');
+    }
+  };
+
+  const handleAlertToggle = async () => {
+    try {
+      const updatedProfile = { ...userProfile, alerting: !userProfile.alerting };
+      await userApi.updateUser(userProfile.id, updatedProfile);
+      setUserProfile(updatedProfile);
+      
+      // Update localStorage
+      const userData = localStorage.getItem('userData');
+      if (userData) {
+        const user = JSON.parse(userData);
+        const updatedUser = { ...user, ...updatedProfile };
+        localStorage.setItem('userData', JSON.stringify(updatedUser));
+      }
+      
+      toast.success(`Alerts ${updatedProfile.alerting ? 'enabled' : 'disabled'} successfully!`);
+    } catch (error) {
+      console.error('Failed to toggle alerts:', error);
+      toast.error('Failed to update alert settings. Please try again.');
+    }
+  };
+
+  const handleThresholdChange = async (newThreshold: number) => {
+    try {
+      const updatedProfile = { ...userProfile, energyAlertingThreshold: newThreshold };
+      await userApi.updateUser(userProfile.id, updatedProfile);
+      setUserProfile(updatedProfile);
+      
+      // Update localStorage
+      const userData = localStorage.getItem('userData');
+      if (userData) {
+        const user = JSON.parse(userData);
+        const updatedUser = { ...user, ...updatedProfile };
+        localStorage.setItem('userData', JSON.stringify(updatedUser));
+      }
+      
+      toast.success('Threshold updated successfully!');
+    } catch (error) {
+      console.error('Failed to update threshold:', error);
+      toast.error('Failed to update threshold. Please try again.');
+    }
   };
 
   const renderProfileTab = () => (
@@ -119,7 +195,7 @@ const Settings = () => {
               <p className="text-sm text-gray-600">Receive alerts when energy consumption exceeds thresholds</p>
             </div>
             <button
-              onClick={() => setUserProfile(prev => ({ ...prev, alerting: !prev.alerting }))}
+              onClick={handleAlertToggle}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                 userProfile.alerting ? 'bg-blue-600' : 'bg-gray-200'
               }`}
@@ -139,10 +215,7 @@ const Settings = () => {
             <input
               type="number"
               value={userProfile.energyAlertingThreshold}
-              onChange={(e) => setUserProfile(prev => ({ 
-                ...prev, 
-                energyAlertingThreshold: parseFloat(e.target.value) 
-              }))}
+              onChange={(e) => handleThresholdChange(parseFloat(e.target.value))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>

@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 import Devices from './pages/Devices';
 import UsageAnalytics from './pages/Usage';
 import Alerts from './pages/Alerts';
+import Insights from './pages/Insights';
 import Settings from './pages/Settings';
 import SearchResults from './pages/SearchResults';
 import Help from './pages/Help';
@@ -55,6 +56,13 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <Alerts />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/insights" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Insights />
                 </Layout>
               </ProtectedRoute>
             } />

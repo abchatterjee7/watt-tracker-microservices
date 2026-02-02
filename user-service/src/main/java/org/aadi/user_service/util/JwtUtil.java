@@ -19,11 +19,11 @@ public class JwtUtil {
 
     private final JwtConfig jwtConfig;
 
-    public String generateToken(String username, List<String> roles, Long userId) {
+    public String generateToken(String email, List<String> roles, Long userId) {
         Instant now = Instant.now();
         
         return Jwts.builder()
-                .subject(username)
+                .subject(email)
                 .claim("userId", userId)
                 .claim("roles", roles)
                 .issuedAt(Date.from(now))
@@ -41,7 +41,7 @@ public class JwtUtil {
                 .getPayload();
     }
 
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         return extractClaims(token).getSubject();
     }
 

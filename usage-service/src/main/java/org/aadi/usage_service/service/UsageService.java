@@ -108,40 +108,48 @@ public class UsageService {
 
     @Scheduled(cron = "*/10 * * * * *")
     public void aggregateDeviceEnergyUsage() {
+        log.info("Starting aggregateDeviceEnergyUsage...");
         final Instant now = Instant.now();
-        final Instant oneHourAgo = now.minusSeconds(3600);
+        final Instant oneDayAgo = now.minusSeconds(86400); // Look back 24 hours for testing
 
         if (influxBucket == null || influxOrg == null) {
             log.error("InfluxDB configuration is missing - cannot aggregate device energy usage");
             return;
         }
         
+        log.info("Querying InfluxDB from {} to {}", oneDayAgo, now);
         String fluxQuery = String.format("""
         from(bucket: "%s")
           |> range(start: time(v: "%s"), stop: time(v: "%s"))
           |> filter(fn: (r) => r["_measurement"] == "energy_usage")
           |> filter(fn: (r) => r["_field"] == "energyConsumed")
+          |> filter(fn: (r) => exists(r["deviceId"]))
           |> group(columns: ["deviceId"])
           |> sum(column: "_value")
-        """, influxBucket, oneHourAgo.toString(), now);
+        """, influxBucket, oneDayAgo.toString(), now.toString());
 
         QueryApi queryApi = influxDBClient.getQueryApi();
         List<FluxTable> tables = queryApi.query(
                 Objects.requireNonNull(fluxQuery, "fluxQuery cannot be null"),
                 Objects.requireNonNull(influxOrg, "influxOrg cannot be null"));
 
+        log.info("InfluxDB query executed, found {} tables", tables.size());
         List<DeviceEnergy> deviceEnergies = new ArrayList<>();
 
         for (FluxTable table : tables) {
             for (FluxRecord record : table.getRecords()) {
-                String deviceIdStr = (String) record.getValueByKey("deviceId");
-                Double energyConsumed = record.getValueByKey("_value") instanceof Number ?
-                        ((Number) Objects.requireNonNull(record.getValueByKey("_value"), "_value cannot be null")).doubleValue() : 0.0;
-
+                Object deviceIdObj = record.getValueByKey("deviceId");
+                Object energyValue = record.getValue();
+                if (deviceIdObj == null || energyValue == null || deviceIdObj.toString().isEmpty()) {
+                    log.warn("Skipping record with null/empty deviceId or energy value: {}", record);
+                    continue;
+                }
+                log.info("Found record: deviceId={}, energy={}", 
+                    deviceIdObj, energyValue);
                 deviceEnergies.add(
                         DeviceEnergy.builder()
-                                .deviceId(Long.valueOf(deviceIdStr))
-                                .energyConsumed(energyConsumed)
+                                .deviceId(Long.valueOf(deviceIdObj.toString()))
+                                .energyConsumed(Double.valueOf(energyValue.toString()))
                                 .build()
                 );
             }
@@ -275,6 +283,7 @@ public class UsageService {
           |> range(start: time(v: "%s"), stop: time(v: "%s"))
           |> filter(fn: (r) => r["_measurement"] == "energy_usage")
           |> filter(fn: (r) => r["_field"] == "energyConsumed")
+          |> filter(fn: (r) => exists(r["deviceId"]))
           |> filter(fn: (r) => %s)
           |> group(columns: ["deviceId"])
           |> sum(column: "_value")

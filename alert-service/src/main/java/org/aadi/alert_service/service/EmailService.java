@@ -29,7 +29,7 @@ public class EmailService {
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setFrom("noreply@watt_tracker.com");
+        message.setFrom("noreply@watt-tracker.com");
         message.setSubject(subject);
         message.setText(body);
 

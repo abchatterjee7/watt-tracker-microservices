@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Bell, BellOff, AlertTriangle, CheckCircle, Clock, Settings } from 'lucide-react';
+import { Bell, AlertTriangle, Clock, CheckCircle, Settings } from 'lucide-react';
 import { alertApi } from '../services/api';
 import type { Alert } from '../types';
 import { useAuth } from '../contexts/AuthContext';
@@ -43,12 +43,27 @@ const Alerts = () => {
     loadAlerts();
   }, [user]);
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'high': return 'border-red-200 bg-red-50';
-      case 'medium': return 'border-yellow-200 bg-yellow-50';
-      case 'low': return 'border-blue-200 bg-blue-50';
-      default: return 'border-gray-200 bg-gray-50';
+  const triggerAlertCheck = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_GATEWAY_URL || 'http://localhost:9090'}/usage-service/api/v1/usage/check-alerts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        // Reload alerts after triggering check
+        setTimeout(() => {
+          if (user) {
+            alertApi.getAlertsForUser(user.id)
+              .then(alertsData => setAlerts(alertsData))
+              .catch(() => setAlerts([]));
+          }
+        }, 2000); // Wait 2 seconds for alerts to be processed
+      }
+    } catch (error) {
+      console.error('Failed to trigger alert check:', error);
     }
   };
 
@@ -61,7 +76,17 @@ const Alerts = () => {
     }
   };
 
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case 'high': return 'border-red-200 bg-red-50';
+      case 'medium': return 'border-yellow-200 bg-yellow-50';
+      case 'low': return 'border-blue-200 bg-blue-50';
+      default: return 'border-gray-200 bg-gray-50';
+    }
+  };
+
   const getAlertTypeLabel = (type: string) => {
+    if (!type) return 'Unknown Alert';
     return type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
 
@@ -137,7 +162,16 @@ const Alerts = () => {
 
       {/* Alert Settings Card */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Alert Settings</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Quick Alert Settings</h3>
+          <button
+            onClick={triggerAlertCheck}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+          >
+            <Bell className="w-4 h-4" />
+            Trigger Alert Check
+          </button>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div>
@@ -203,21 +237,21 @@ const Alerts = () => {
         <div className="p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Alert History</h3>
           <div className="space-y-4">
-            {alerts.map((alert: any) => (
-              <div key={alert.id} className={`border rounded-lg p-4 ${getSeverityColor(alert.severity)}`}>
+            {alerts.map((alert: Alert) => (
+              <div key={alert.id} className={`border rounded-lg p-4 ${getSeverityColor(alert.severity || 'low')}`}>
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-3">
-                    {getSeverityIcon(alert.severity)}
+                    {getSeverityIcon(alert.severity || 'low')}
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
                         <span className="text-sm font-medium text-gray-500">
-                          {getAlertTypeLabel(alert.type)}
+                          {getAlertTypeLabel(alert.type || 'energy_alert')}
                         </span>
-                        <span className={`text-xs px-2 py-1 rounded-full ${getSeverityColor(alert.severity)}`}>
-                          {alert.severity.toUpperCase()}
+                        <span className={`text-xs px-2 py-1 rounded-full ${getSeverityColor(alert.severity || 'low')}`}>
+                          {(alert.severity || 'low').toUpperCase()}
                         </span>
                       </div>
-                      <p className="text-gray-500 mb-2">{alert.message}</p>
+                      <p className="text-gray-500 mb-2">{alert.message || 'Energy alert notification'}</p>
                       
                       {(alert.value || alert.threshold) && (
                         <div className="text-sm text-gray-600 mb-2">
@@ -229,27 +263,22 @@ const Alerts = () => {
                       )}
                       
                       {alert.device && (
-                        <p className="text-sm text-gray-600 mb-2">Device: {alert.device}</p>
+                        <div className="text-sm text-gray-600 mb-2">
+                          Device: {alert.device}
+                        </div>
                       )}
                       
-                      <div className="flex items-center space-x-4 text-sm text-gray-500">
-                        <div className="flex items-center">
-                          <Clock className="w-4 h-4 mr-1" />
-                          {new Date(alert.timestamp).toLocaleString()}
-                        </div>
-                        <div className="flex items-center">
-                          {alert.acknowledged ? (
-                            <>
-                              <CheckCircle className="w-4 h-4 mr-1 text-green-600" />
-                              Acknowledged
-                            </>
-                          ) : (
-                            <>
-                              <BellOff className="w-4 h-4 mr-1 text-yellow-600" />
-                              Pending
-                            </>
-                          )}
-                        </div>
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <span>
+                          {alert.timestamp ? new Date(alert.timestamp).toLocaleString() : new Date(alert.createdAt).toLocaleString()}
+                        </span>
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          alert.acknowledged 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {alert.acknowledged ? 'Acknowledged' : 'Pending'}
+                        </span>
                       </div>
                     </div>
                   </div>

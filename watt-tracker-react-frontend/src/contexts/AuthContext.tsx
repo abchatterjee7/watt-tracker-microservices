@@ -9,7 +9,7 @@ interface AuthContextType {
   token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (username: string, password: string) => Promise<{ success: boolean; message: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; message: string }>;
   register: (userData: Omit<User, 'id'> & { password: string }) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
 }
@@ -107,16 +107,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const login = async (username: string, password: string): Promise<{ success: boolean; message: string }> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; message: string }> => {
     try {
-      const response = await userApi.login(username, password);
+      const response = await userApi.login(email, password);
       
       if (response.token) {
         // Create user object from JWT response
         const user: User = {
           id: response.userId,
-          email: username, // Using username as email for now
-          name: username.split('@')[0] || 'User', // Extract name from email
+          email: email,
+          name: email.split('@')[0] || 'User', // Extract name from email
           surname: '',
           address: '',
           alerting: false,

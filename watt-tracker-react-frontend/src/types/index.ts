@@ -38,6 +38,16 @@ export interface Alert {
   userId: number;
   createdAt: string;
   sent: boolean;
+  type?: string;
+  severity?: string;
+  message?: string;
+  value?: number;
+  threshold?: number;
+  expectedValue?: number;
+  averageValue?: number;
+  device?: string;
+  timestamp?: string;
+  acknowledged?: boolean;
 }
 
 export interface EnergyUsageEvent {

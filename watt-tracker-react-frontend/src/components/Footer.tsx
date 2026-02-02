@@ -67,6 +67,11 @@ const Footer = () => {
                   </a>
                 </li>
                 <li>
+                  <a href="/insights" className="text-gray-300 hover:text-white transition-colors text-sm md:text-base">
+                    AI Tips
+                  </a>
+                </li>
+                <li>
                   <a href="/settings" className="text-gray-300 hover:text-white transition-colors text-sm md:text-base">
                     Settings
                   </a>

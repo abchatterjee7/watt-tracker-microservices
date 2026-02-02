@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useState, useEffect } from 'react';
-import { Home, Zap, Settings, BarChart3, Bell } from 'lucide-react';
+import { Home, Zap, Settings, BarChart3, Bell, Lightbulb } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
@@ -32,6 +32,7 @@ const Layout = ({ children }: LayoutProps) => {
     { name: 'Devices', href: '/devices', icon: Zap },
     { name: 'Usage', href: '/usage', icon: BarChart3 },
     { name: 'Alerts', href: '/alerts', icon: Bell },
+    { name: 'Insights', href: '/insights', icon: Lightbulb },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 

@@ -22,29 +22,29 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     public AuthResponse authenticate(AuthRequest authRequest) {
-        String identifier = authRequest.getEmail() != null ? authRequest.getEmail() : authRequest.getUsername();
-        log.info("Authenticating user: {}", identifier);
+        String email = authRequest.getEmail();
+        log.info("Authenticating user: {}", email);
         
-        User user = userRepository.findByEmail(identifier)
-                .orElseThrow(() -> new RuntimeException("User not found: " + identifier));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
 
         if (!passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid password for user: " + identifier);
+            throw new RuntimeException("Invalid password for user: " + email);
         }
 
         String token = jwtUtil.generateToken(
-                user.getUsername(),
+                user.getEmail(),
                 List.of(user.getRole().name()),
                 user.getId()
         );
 
-        log.info("User authenticated successfully: {}", identifier);
+        log.info("User authenticated successfully: {}", email);
         
         return new AuthResponse(
                 token,
                 "Bearer",
                 user.getId(),
-                user.getUsername(),
+                user.getEmail(),
                 user.getRole().name()
         );
     }

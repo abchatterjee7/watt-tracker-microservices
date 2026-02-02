@@ -8,6 +8,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -46,7 +47,7 @@ public class ParallelDataSimulator implements CommandLineRunner {
         ((ThreadPoolExecutor)executorService).setCorePoolSize(parallelThreads);
     }
 
-    //@Scheduled(fixedRateString = "${simulation.interval-ms}")
+    @Scheduled(fixedRateString = "${simulation.interval-ms}")
     public void sendMockData() {
         int batchSize = requestsPerInterval / parallelThreads;
         int remainder = requestsPerInterval % parallelThreads;
@@ -55,9 +56,12 @@ public class ParallelDataSimulator implements CommandLineRunner {
             int requestsForThread = batchSize + (i < remainder ? 1 : 0);
             executorService.submit(() -> {
                 for (int j = 0; j < requestsForThread; j++) {
+                    // Target actual user devices (1 and 2) for realistic testing
+                    long deviceId = random.nextBoolean() ? 1L : 2L;
+                    
                     EnergyUsageDto dto = EnergyUsageDto.builder()
-                            .deviceId(random.nextLong(1, 200))
-                            .energyConsumed(Math.round(random.nextDouble(0.0, 2.0) * 100.0) / 100.0)
+                            .deviceId(deviceId)
+                            .energyConsumed(Math.round(random.nextDouble(5.0, 50.0) * 100.0) / 100.0) // Higher consumption (5-50 units)
                             .timestamp(LocalDateTime.now()
                                     .atZone(ZoneId.systemDefault()).toInstant())
                             .build();

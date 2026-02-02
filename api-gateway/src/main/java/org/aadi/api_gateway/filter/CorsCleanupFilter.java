@@ -28,7 +28,7 @@ public class CorsCleanupFilter implements GlobalFilter, Ordered {
         return chain.filter(exchange).then(Mono.fromRunnable(() -> {
             // Add our own CORS headers only once
             String origin = request.getHeaders().getFirst(HttpHeaders.ORIGIN);
-            if (origin != null && (origin.equals("http://localhost:5173") || origin.equals("http://localhost:3000"))) {
+            if (origin != null && (origin.equals("http://localhost:5173"))) {
                 // Only add if not already present
                 if (!headers.containsKey(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)) {
                     headers.add(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);

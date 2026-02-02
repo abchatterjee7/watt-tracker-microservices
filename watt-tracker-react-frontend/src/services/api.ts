@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 const API_GATEWAY_URL = import.meta.env.VITE_API_URL || 'http://localhost:9090';
 
 const api = axios.create({
-  timeout: 10000,
+  timeout: 60000,
 });
 
 // Add JWT token to requests
@@ -59,9 +59,9 @@ export const userApi = {
   },
 
   // Authentication APIs
-  login: async (username: string, password: string): Promise<{ token: string; type: string; userId: number; username: string; role: string }> => {
+  login: async (email: string, password: string): Promise<{ token: string; type: string; userId: number; email: string; role: string }> => {
     const response = await api.post(`${API_GATEWAY_URL}/user-service/api/v1/auth/login`, {
-      email: username,
+      email: email,
       password
     });
     return response.data;
@@ -186,5 +186,43 @@ export const alertApi = {
       }
       throw error; // Re-throw other errors
     }
+  }
+};
+
+// Insight Service APIs
+export const insightApi = {
+  getSavingTips: async (userId: number): Promise<{ userId: number; tips: string; energyUsage: number }> => {
+    try {
+      const response = await api.get(`${API_GATEWAY_URL}/insight-service/api/v1/insight/saving-tips/${userId}`);
+      return response.data;
+    } catch (error: any) {
+      if (error.code === 'NETWORK_ERROR' || error.response?.status === 404) {
+        console.log('Insight service not available');
+        throw new Error('Insight service not available');
+      }
+      throw error;
+    }
+  },
+  
+  getOverview: async (userId: number): Promise<{ userId: number; tips: string; energyUsage: number }> => {
+    try {
+      const response = await api.get(`${API_GATEWAY_URL}/insight-service/api/v1/insight/overview/${userId}`);
+      return response.data;
+    } catch (error: any) {
+      if (error.code === 'NETWORK_ERROR' || error.response?.status === 404) {
+        console.log('Insight service not available');
+        throw new Error('Insight service not available');
+      }
+      throw error;
+    }
+  },
+
+  // Streaming APIs
+  getSavingTipsStream: (userId: number): EventSource => {
+    return new EventSource(`${API_GATEWAY_URL}/insight-service/api/v1/insight/saving-tips/${userId}/stream`);
+  },
+
+  getOverviewStream: (userId: number): EventSource => {
+    return new EventSource(`${API_GATEWAY_URL}/insight-service/api/v1/insight/overview/${userId}/stream`);
   }
 };

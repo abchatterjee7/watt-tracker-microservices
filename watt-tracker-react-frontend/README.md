@@ -38,17 +38,20 @@ A comprehensive React frontend for the Watt Tracker microservices-based energy m
 - How Watt Tracker App Settings Page =>
 ![settings](../screenshots/6.png)
 
+- How Watt Tracker App AI Tips in Insights Page =>
+![AI Tips](./screenshots/ai-tips.png)
+
 
 ### External Tools
 
 - How Kafka-UI looks =>
-![kafka](../screenshots/kafka-ui.png)
+![kafka](../screenshots/kafkaui.png)
 
 - How InfluxDB looks =>
-![influxdb](../screenshots/influx-db.png)
+![influxdb](../screenshots/influxdb.png)
 
 - How Mailpit looks =>
-![mailpit](../screenshots/mail.png)
+![mailpit](../screenshots/email.png)
 
 - How Docker looks =>
 ![docker](../screenshots/docker.png)
@@ -99,6 +102,45 @@ A comprehensive React frontend for the Watt Tracker microservices-based energy m
 - **Lucide React** - Beautiful icon library
 - **Axios** - HTTP client for API communication
 
+
+## 📊 Mock Data Scale Analysis:
+🔥 High Volume Generation:
+- 10,000 requests per interval (from config: simulation.requests-per-interval=10000)
+- Every 60 seconds (from config: simulation.interval-ms=60000) = 10,000 energy usage events per minute
+
+⚡ Parallel Processing:
+- 2 parallel threads (from config: simulation.parallel-threads=2)
+- 5,000 requests per thread (10,000 ÷ 2)
+- Concurrent execution for maximum throughput
+
+🎯 Device Coverage:
+- 200 unique devices (from code: random.nextLong(1, 200))
+- Realistic consumption: 0.0-2.0 kWh per event
+- Random distribution across all devices
+
+📈 Daily Scale:
+- 600,000 events per hour (10,000 × 60)
+- 14.4 million events per day (600,000 × 24)
+- 525.6 million events per month (14.4M × 30)
+
+🔄 Data Flow:
+- Ingestion Service → Generates 10K events/min
+- Kafka → Streams to Usage Service
+- Usage Service → Stores in InfluxDB
+- Frontend → Queries aggregated data
+
+💾 Storage Impact:
+- Time-series data in InfluxDB
+- Hourly aggregations per device
+- User-level summaries for dashboard
+- Alert calculations based on thresholds
+
+🚀 Performance Characteristics:
+- High-throughput: 167 events per second
+- Low latency: Parallel processing
+- Scalable: Easy to increase threads/requests
+- Realistic: Simulates actual smart home usage
+
 ## Prerequisites
 
 - Node.js 18+ 
@@ -131,16 +173,16 @@ A comprehensive React frontend for the Watt Tracker microservices-based energy m
 
 The frontend connects to the following microservices:
 
+- **Eureka Server** (Port 8761): Service Discovery
+- **Config Server** (Port 8888): Github config management
+- **User Service** (Port 8086): User management and profiles
 - **Device Service** (Port 8081): Device registration and management
 - **Ingesion Service** (Port 8082): Ingesion management
 - **Usage Service** (Port 8083): Energy consumption data and analytics
 - **Alert Service** (Port 8084): Alert management and notifications 
 - **Insight Service** (Port 8085): Insight management
-- **User Service** (Port 8086): User management and profiles
-
 - **API Gateway Service** (Port 9090): API gateway
-- **Eureka Server** (Port 8761): Service Discovery
-- **Config Server** (Port 8888): Github config management
+
 
 ## Configuration
 
@@ -247,12 +289,12 @@ For issues and questions:
 
 # MicroServices Port
 ```
+user-service = 8086
 device-service = 8081
 ingestion-service = 8082
 usage-service = 8083
 alert-service = 8084
 insight-service = 8085
-user-service = 8086
 
 api-gateway = 9090
 eureka = 8761

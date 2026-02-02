@@ -132,7 +132,7 @@ const UsageAnalytics = () => {
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
               <p className="text-xs text-gray-600 truncate">Total Consumption</p>
-              <p className="text-xs sm:text-sm md:text-2xl font-bold text-gray-900 truncate">{totalConsumption.toFixed(1)} kWh</p>
+              <p className="text-xs sm:text-sm md:text-2xl font-bold text-gray-900 truncate">{totalConsumption.toFixed(2)} kWh</p>
             </div>
             <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-8 md:h-8 text-blue-600 flex-shrink-0 ml-1" />
           </div>
@@ -152,7 +152,7 @@ const UsageAnalytics = () => {
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
               <p className="text-xs text-gray-600 truncate">Daily Average</p>
-              <p className="text-xs sm:text-sm md:text-2xl font-bold text-gray-900 truncate">{(totalConsumption / 7).toFixed(1)} kWh</p>
+              <p className="text-xs sm:text-sm md:text-2xl font-bold text-gray-900 truncate">{(totalConsumption / 7).toFixed(2)} kWh</p>
             </div>
             <Calendar className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-8 md:h-8 text-yellow-600 flex-shrink-0 ml-1" />
           </div>

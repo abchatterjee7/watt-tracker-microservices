@@ -84,15 +84,19 @@ const Dashboard = () => {
   }, [user]);
 
   // Generate hourly data from real usage
-  const hourlyData = usageData?.devices?.length ? [
-    { time: '00:00', consumption: 1.2 },
-    { time: '04:00', consumption: 0.8 },
-    { time: '08:00', consumption: 3.5 },
-    { time: '12:00', consumption: 4.2 },
-    { time: '16:00', consumption: 3.8 },
-    { time: '20:00', consumption: 5.1 },
-    { time: '23:00', consumption: 1.8 }
-  ] : [
+  // TODO: Backend should provide hourly aggregated data instead of hardcoded values
+  const hourlyData = usageData?.devices?.length ? 
+    // For now, distribute total consumption evenly across hours when real data exists
+    Array.from({ length: 7 }, (_, i) => {
+      const hour = i * 4; // 0, 4, 8, 12, 16, 20, 23
+      const totalConsumption = usageData.devices.reduce((sum: number, device: any) => 
+        sum + (device.energyConsumed || 0), 0);
+      const avgConsumption = totalConsumption / 7; // Even distribution
+      return {
+        time: `${hour.toString().padStart(2, '0')}:00`,
+        consumption: Number(avgConsumption.toFixed(2))
+      };
+    }) : [
     { time: '00:00', consumption: 0 },
     { time: '04:00', consumption: 0 },
     { time: '08:00', consumption: 0 },
@@ -150,7 +154,7 @@ const Dashboard = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm text-gray-600">Total Consumption</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalEnergyConsumption} kWh</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.totalEnergyConsumption.toFixed(2)} kWh</p>
             </div>
           </div>
         </div>
@@ -162,7 +166,7 @@ const Dashboard = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm text-gray-600">Daily Average</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.averageDailyConsumption} kWh</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.averageDailyConsumption.toFixed(2)} kWh</p>
             </div>
           </div>
         </div>
