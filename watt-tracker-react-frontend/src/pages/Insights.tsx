@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Lightbulb, TrendingUp, RefreshCw, Zap } from 'lucide-react';
-import { insightApi } from '../services/api';
+import { insightApi, usageApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import type { Usage } from '../types';
 
 interface InsightData {
   userId: number;
@@ -13,13 +14,15 @@ const Insights = () => {
   const { user } = useAuth();
   const [savingTips, setSavingTips] = useState<InsightData | null>(null);
   const [overview, setOverview] = useState<InsightData | null>(null);
+  const [usageData, setUsageData] = useState<Usage | null>(null);
   const [loading, setLoading] = useState(false);
+  const [insightLoading, setInsightLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const loadInsights = async () => {
     if (!user) return;
     
-    setLoading(true);
+    setInsightLoading(true);
     setError(null);
     
     try {
@@ -31,7 +34,7 @@ const Insights = () => {
       
       setSavingTips(tipsData);
       setOverview(overviewData);
-      setLoading(false);
+      setInsightLoading(false);
       
     } catch (error) {
       console.error('Failed to load insights:', error);
@@ -46,14 +49,35 @@ const Insights = () => {
       setSavingTips(fallbackData);
       setOverview(fallbackData);
       setError('AI service is responding slowly. Showing general tips.');
-      setLoading(false);
+      setInsightLoading(false);
     }
   };
 
+  // Load today's usage data automatically
   useEffect(() => {
-    // Don't load automatically - only on button click
-    setLoading(false);
+    const loadUsageData = async () => {
+      if (!user) return;
+      
+      try {
+        setLoading(true);
+        const usage = await usageApi.getUserUsage(user.id, 1); // Get today's usage
+        setUsageData(usage);
+      } catch (error) {
+        console.error('Failed to load usage data:', error);
+        setUsageData({
+          userId: user.id,
+          devices: []
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUsageData();
   }, [user]);
+
+  // Calculate today's usage from real data
+  const todayUsage = usageData?.devices?.reduce((sum: number, device: any) => sum + (device.energyConsumed || 0), 0) || 0;
 
   const formatEnergyUsage = (usage: number) => {
     return `${usage.toFixed(2)} kWh`;
@@ -101,16 +125,16 @@ const Insights = () => {
               </h1>
               <p className="text-gray-600 mt-2">AI-powered energy saving tips and analysis</p>
               <div className="flex items-center gap-2 mt-3">
-                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                <span className="text-sm text-gray-600 font-medium">Click "Generate Insights" to get AI tips</span>
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-sm text-gray-600 font-medium">Today's usage updated automatically</span>
               </div>
             </div>
             <button
               onClick={loadInsights}
-              disabled={loading}
+              disabled={insightLoading}
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? (
+              {insightLoading ? (
                 <>
                   <RefreshCw className="w-5 h-5 animate-spin" />
                   Generating Insights...
@@ -133,7 +157,7 @@ const Insights = () => {
                 <Lightbulb className="w-6 h-6 text-blue-600" />
               </div>
               <div className="text-2xl font-bold text-gray-900">
-                {formatEnergyUsage(savingTips?.energyUsage || 0)}
+                {formatEnergyUsage(todayUsage)}
               </div>
             </div>
             <h3 className="text-lg font-semibold text-gray-900">Current Usage</h3>
@@ -175,20 +199,25 @@ const Insights = () => {
             </div>
             <h2 className="text-2xl font-bold text-gray-900">Energy Overview</h2>
           </div>
-          {overview && (
-            <div className="space-y-6">
+          <div className="space-y-6">
               <div className="bg-gray-50 rounded-lg p-6">
                 <div className="text-3xl font-bold text-gray-900 mb-2">
-                  {formatEnergyUsage(overview.energyUsage)}
+                  {formatEnergyUsage(todayUsage)}
                 </div>
                 <div className="prose prose-lg max-w-none">
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                    {overview?.tips}
+                  <p className="text-gray-700 leading-relaxed">
+                    Today's total energy consumption from all your devices. 
+                    {overview?.tips && (
+                      <>
+                        <br /><br />
+                        <strong>AI Analysis:</strong><br />
+                        {overview.tips}
+                      </>
+                    )}
                   </p>
                 </div>
               </div>
             </div>
-          )}
         </div>
 
         {/* Energy Saving Tips Card */}
@@ -199,20 +228,18 @@ const Insights = () => {
             </div>
             <h2 className="text-2xl font-bold text-gray-900">Energy Saving Tips</h2>
           </div>
-          {savingTips && (
-            <div className="space-y-6">
+          <div className="space-y-6">
               <div className="bg-gray-50 rounded-lg p-6">
                 <div className="text-2xl font-bold text-gray-900 mb-4">
-                  {formatEnergyUsage(savingTips.energyUsage)}
+                  {formatEnergyUsage(todayUsage)}
                 </div>
                 <div className="prose prose-lg max-w-none">
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                    {savingTips?.tips}
+                  <p className="text-gray-700 leading-relaxed">
+                    {savingTips?.tips || "Click 'Generate Insights' to get personalized energy-saving tips based on your usage patterns."}
                   </p>
                 </div>
               </div>
             </div>
-          )}
         </div>
 
         {/* AI Info Card */}
